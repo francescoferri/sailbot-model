@@ -1,5 +1,5 @@
-function [H_speed] = hull(H_drag, H_par)
+function [boat_speed] = hull(boat_reaction, H_par)
 
-H_speed = sqrt(H_drag/H_par);
+boat_speed = sqrt(boat_reaction(1)/H_par);
 
 end
