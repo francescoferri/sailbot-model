@@ -1,4 +1,4 @@
-function [cl, cd, cdp, cm] = findAirfoilCoeff(reynolds_number, alpha, airfoil_matrix)
+function [cl, cd, cdp, cm, alpha_v] = findAirfoilCoeff(reynolds_number, alpha, airfoil_matrix)
 
 % Find Closest Re that is tabulated
 reynolds_tabulated = transpose(unique(airfoil_matrix(:,1))); % Values of Re Tabulated, 500-200-100k
@@ -6,10 +6,14 @@ reynolds_tabulated = transpose(unique(airfoil_matrix(:,1))); % Values of Re Tabu
 ReTab=reynolds_tabulated(idx); % parse closest Re tabulated in M
 
 % Find alphas available for closest reynolds_number tabulated
-data = zeros(1,6);
+data = [];
+k=0;
 for i = 1:size(airfoil_matrix,1)
     if (airfoil_matrix(i,1) == ReTab)
-        data(i,1:6) = airfoil_matrix(i,2:7); % extract data
+
+        k = k + 1;
+        data(k,:) = airfoil_matrix(i,2:7); % extract data
+        
     end 
 end
 
