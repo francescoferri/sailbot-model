@@ -26,21 +26,29 @@ classdef HullMedium
         
         function [boat_reaction, boat_speed] = computeHullState(obj, boat_reaction, boat_speed)
             
+            %% find new boat speed
+            speed = norm(boat_speed); % speed magnitude [ms]
+            u_speed = boat_speed/speed; % speed direction (X-Y plane)
+
             % current sailing condition
-            current_speed_kn = obj.MsToKn * boat_speed;
+            current_speed_kn = obj.MsToKn * speed;
             existing_hull_drag = -obj.HullParameter*current_speed_kn^2; % pointing backwards (-ve x)
             
             thrust = existing_hull_drag + boat_reaction(1,1);
             
-            boat_speed_kn = sqrt(abs(thrust)/obj.HullParameter);
-            new_boat_speed = boat_speed_kn/obj.MsToKn;
+            speed_kn = sqrt(abs(thrust)/obj.HullParameter);
+            new_speed = speed_kn/obj.MsToKn;
             
-            speed_delta = new_boat_speed - boat_speed;
+            speed_delta = new_speed - speed;
             
-            boat_speed = boat_speed + speed_delta * obj.DampenerFactor;
-            
+            speed = speed + speed_delta * obj.DampenerFactor;
+
+            boat_speed = speed * u_speed;
+
+
+            %% reset boat reaction vector
             % we assume that the hull can counteract
-            % 1. reset the net thrust due to hull drag
+            % 1. the net thrust (thrust = drag --> net = 0)
             boat_reaction(1,1) = 0;
             % 2. force of gravity (with boiancy)
             boat_reaction(1,3) = 0;
