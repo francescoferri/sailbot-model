@@ -24,8 +24,12 @@ alphas = data(:,1);
 alpha_max = max(alphas);
 alpha_min = min(alphas);
 
-if (alpha == alpha_max || alpha == alpha_min)
+if (alpha > alpha_max)
     at_stall = true;
+    alpha = alpha_max;
+elseif (alpha < alpha_min)
+    at_stall = true;
+    alpha = alpha_min;
 end
 
 idx = find(alphas(:,1) == alpha);

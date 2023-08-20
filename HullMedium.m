@@ -27,30 +27,30 @@ classdef HullMedium
         function [boat_reaction, boat_speed] = computeHullState(obj, boat_reaction, boat_speed)
             
             %% find new boat speed
-            speed = norm(boat_speed); % speed magnitude [ms]
-            u_speed = boat_speed/speed; % speed direction (X-Y plane)
+            speed = boat_speed(1); % speed magnitude [ms]
+            % u_speed = boat_speed/speed; % speed direction (X-Y plane)
 
             % current sailing condition
             current_speed_kn = obj.MsToKn * speed;
             existing_hull_drag = -obj.HullParameter*current_speed_kn^2; % pointing backwards (-ve x)
-            
+
             thrust = existing_hull_drag + boat_reaction(1,1);
-            
+
             speed_kn = sqrt(abs(thrust)/obj.HullParameter);
             new_speed = speed_kn/obj.MsToKn;
-            
+
             speed_delta = new_speed - speed;
-            
+
             speed = speed + speed_delta * obj.DampenerFactor;
 
-            boat_speed = speed * u_speed;
+            boat_speed(1) = speed;
 
             %% find new drift rate
-            drift_force = [boat_reaction(1,1) boat_reaction(1,2)];
-            u_drift_force = drift_force/norm(drift_force);
-
-            drift_factor = 1;
-            boat_speed = boat_speed + u_drift_force*drift_factor;
+            % drift_force = [boat_reaction(1,1) boat_reaction(1,2)];
+            % u_drift_force = drift_force/norm(drift_force);
+            % 
+            % drift_factor = 1;
+            % boat_speed = boat_speed + u_drift_force * drift_factor;
 
             %% reset boat reaction vector
             % we assume that the hull can counteract
