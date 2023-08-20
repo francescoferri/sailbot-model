@@ -40,7 +40,16 @@ K_airfoil
         
         function [boat_reaction, boat_heel] = computeKeelState(obj, W_speed, W_angle, boat_reaction, boat_speed, boat_heel, K_span, K_avg_ch, K_mass, K_airfoil)
             
-            %% get some initial data
+            K_torque_debt = boat_reaction(2,1)*2; % assumed a perfect
+            % force couple moment about the x-axis (sail force = keel force in y direction)
+
+            boat_heel_new = asin(K_torque_debt/(K_span*K_mass*9.81));
+            heel_delta = boat_heel_new - boat_heel;
+            boat_heel = boat_heel + heel_delta;
+            boat_reaction(2,1) = 0;
+            
+            %{
+ get some initial data
             reynolds_number = obj.FluidDensity*K_avg_ch*boat_speed/obj.FluidViscosity;
             K_area = K_span * K_avg_ch; % [m2] assumed to be square
             
@@ -96,16 +105,23 @@ K_airfoil
 
             %% Keel Torques
             % Location of applied hydro force (switch with COP in the future)
-            R = K_span/2;
-            Arm = R * n_airfoil;
-            K_torque = cross(Arm, K_force);
-            boat_reaction(2,:) = boat_reaction(2,:) + K_torque;
-
-            % find new heel
-            increase_factor = (-boat_reaction(2,1) * 0.02);
-            boat_heel = boat_heel + increase_factor;
-
-
+            Arm_hydro = K_span/2 * n_airfoil;
+            K_torque_hydro = cross(Arm_hydro, K_force_hydro);
+            
+            % find total amount of torque due to existing sail torque and
+            % added keel torque due to keel lift
+            K_torque_debt = K_torque_hydro(1) + boat_reaction(2,1);
+            
+            % find new required heel angle to keep balance
+            boat_heel = asin(K_torque_debt/(K_span*K_mass*9.81));
+            
+            % find torque due to bulb at the end of the keel
+            Arm_gravity = K_span*cos(boat_heel) * n_airfoil;
+            K_torque_mass = cross(Arm_gravity, K_gravity);
+            
+            % balance everything onto the boat reaction vector
+            boat_reaction(2,:) = boat_reaction(2,:) + K_torque_hydro + K_torque_mass;
+            %}
         end
     end
 end
