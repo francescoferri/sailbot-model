@@ -85,11 +85,9 @@ S_airfoil
             % Location of applied aerodynamic force (to switch with COP in the future)
             % is the same as the location of COG of sail
             R = S_span/2;
-            Arm = R*n_airfoil;
+            Arm = R * n_airfoil;
 
-            S_torque_aero = cross(Arm, S_force);
-            S_torque_mass = cross(Arm, S_gravity);
-            S_torque = S_torque_aero + S_torque_mass;
+            S_torque = cross(Arm, S_force);
 
             boat_reaction(2,:) = boat_reaction(2,:) + S_torque;
         end
