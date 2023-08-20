@@ -4,10 +4,14 @@ function [boat_reaction, boat_speed] = hull(boat_reaction, boat_speed, H_par)
 current_speed_kn = 1.94384*boat_speed;
 existing_hull_drag = -H_par*current_speed_kn^2; % pointing backwards (-ve x)
 
-net_hull_drag = existing_hull_drag + boat_reaction(1,1);
+thrust = existing_hull_drag + boat_reaction(1,1);
 
-boat_speed_kn = sqrt(abs(net_hull_drag)/H_par);
-boat_speed = boat_speed_kn/1.94384;
+boat_speed_kn = sqrt(abs(thrust)/H_par);
+new_boat_speed = boat_speed_kn/1.94384;
+
+speed_delta = new_boat_speed - boat_speed;
+
+boat_speed = boat_speed + speed_delta*0.9;
 
 % we assume that the hull can counteract
 % 1. reset the net thrust due to hull drag
