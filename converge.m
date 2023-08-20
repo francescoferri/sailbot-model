@@ -1,43 +1,24 @@
-function [H_speedM,H_heelM] = converge(...
-    Vw,...
-    rho,...
-    mu,...
-    S_span,...
-    S_avg_ch,...
-    S_area,...
-    S_alpha,...
-    S_mass,...
-    S_mast_pos,...
-    H_par,...
-    H_speed,...
-    H_heel,...
-    H_heading,...
-    K_length,...
-    K_weight,...
-    M)
+function [boat_stats] = converge(W_speed, W_angle)
 
-i=1; % used for recording
-S_area_M=S_area;
-difference=1;
+initialize
 
-while (difference > 0.0001) 
-    % Compute
-    [S_thrust,S_torque,apparent_wind_angle]=sail(Vw, rho, mu, M, S_area_M, S_avg_ch, S_alpha, S_span, S_mass, H_speed, H_heel, H_heading);
-    [H_heel]=keel(S_torque, K_length, K_weight);
-    [H_speed]=hull(S_thrust, H_par);
+difference = 1;
+old_boat_speed = 0;
+i = 1;
+boat_stats = zeros(1,3);
+
+    while (difference > 0.001)
     
-    % Rectify Area
-    old_S_area_M=S_area_M;
-    S_area_M=S_area*cos(H_heel);
-
-    % Record
-    H_heelM(i)=rad2deg(H_heel);
-    H_speedM(i)=H_speed*1.94384;
+        [boat_reaction] = computeSailState(sailMedium, W_speed, W_angle, boat_reaction, boat_speed, boat_heel, S_span, S_avg_ch, S_alpha, S_mass, S_airfoil);
+        [boat_reaction, boat_speed] = computeHullState(hullMedium, boat_reaction, boat_speed);
+        [boat_reaction, boat_heel] = computeKeelState(keelMedium, W_speed, W_angle, boat_reaction, boat_speed, boat_heel, K_span, K_avg_ch, K_mass, K_airfoil);
+        
+        difference = abs(boat_speed-old_boat_speed);
+        old_boat_speed = boat_speed;
     
-    % difference
-    difference=abs(old_S_area_M-S_area_M);
-
-    i=i+1;
-end
+        boat_stats(i,1:3) = [boat_speed rad2deg(boat_heel) difference];
+        i = i + 1;
+    
+    end
 
 end
