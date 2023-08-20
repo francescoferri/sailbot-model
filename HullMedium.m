@@ -45,6 +45,12 @@ classdef HullMedium
 
             boat_speed = speed * u_speed;
 
+            %% find new drift rate
+            drift_force = [boat_reaction(1,1) boat_reaction(1,2)];
+            u_drift_force = drift_force/norm(drift_force);
+
+            drift_factor = 1;
+            boat_speed = boat_speed + u_drift_force*drift_factor;
 
             %% reset boat reaction vector
             % we assume that the hull can counteract
