@@ -1,9 +1,11 @@
-function [cl, cd, cdp, cm, alpha_v] = findAirfoilCoeff(reynolds_number, alpha, airfoil_matrix)
+function [cl, cd, cdp, cm, alpha_v, at_stall] = findAirfoilCoeff(reynolds_number, alpha, airfoil_matrix)
 
 % Find Closest Re that is tabulated
 reynolds_tabulated = transpose(unique(airfoil_matrix(:,1))); % Values of Re Tabulated, 500-200-100k
-[~,idx]=min(abs(reynolds_tabulated-reynolds_number)); % find index at which difference is smallest
-ReTab=reynolds_tabulated(idx); % parse closest Re tabulated in M
+[~,idx] = min(abs(reynolds_tabulated-reynolds_number)); % find index at which difference is smallest
+ReTab = reynolds_tabulated(idx); % parse closest Re tabulated in M
+
+at_stall = false;
 
 % Find alphas available for closest reynolds_number tabulated
 data = [];
@@ -22,8 +24,8 @@ alphas = data(:,1);
 alpha_max = max(alphas);
 alpha_min = min(alphas);
 
-if (alpha > alpha_max || alpha < alpha_min)
-    error("Airfoil Stalled")
+if (alpha == alpha_max || alpha == alpha_min)
+    at_stall = true;
 end
 
 idx = find(alphas(:,1) == alpha);

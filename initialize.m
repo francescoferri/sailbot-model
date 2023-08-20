@@ -1,4 +1,3 @@
-clear;
 
 % Constants
 ms_to_kn = 1.94384;
@@ -7,14 +6,8 @@ mu_air = 1.81*10^(-5); % dynamic Viscosity [Pa * s]
 rho_water = 1020; % water density [kg/m3]
 mu_water = 1.308*10^(-3); % dynamic Viscosity [Pa * s]
 
-% Globally changing
-W_speed = 0.01; % wind speed [m/s]
-W_angle = 0.01; % [rad] wind angle relative to bow, (+ve to the right)
-
 % Extra variables, to insert into individual studies later
-W_speed_kn = [2.5; 5; 10; 15; 20]; % wind speed [kn]
-W_heading_range = -45:-1:-180; % heading relative to true wind [deg]
-W_heading_range(size(W_heading_range,2)) = -179; % modify last value
+
 
 % coordinate system vectors [x y z]:
 boat_force_vector = [0 0 0]; % [N]
@@ -22,7 +15,7 @@ boat_torque_vector = [0 0 0]; % [Nm]
 boat_reaction = [boat_force_vector; boat_torque_vector];
 
 % boat generated variables
-boat_speed = 0.01; % [m/s] initialized to non zero for calculation
+boat_speed = [0.01 0]; % [m/s] initialized to non zero for calculation
 boat_heel = -0.01; % [rad] initialized to non zero for calculation
 
 % Import Airfoil Data
@@ -39,17 +32,12 @@ sailMedium = SailMedium(rho_air, mu_air, naca18);
 
 % Hull
 % Assumed resistance curve:
-H_par = 7.5; % hull drag parameter
+H_parameter = 7.5; % hull drag parameter
+H_dampener = 0.92;
 H_length = 2.35; %LOA [m]
 froude_n = 0.7; % defined planing limit
-boat_max_speed_kn = froude_n*sqrt(H_length*9.81) * ms_to_kn;% max hull speed [kn]
-boat_speeds_kn=0:0.01:boat_max_speed_kn; % [kn]
-H_resistance = H_par.*boat_speeds_kn.^2; % [N]
-% figure;
-% plot(boat_speeds_kn, H_resistance);
-% title('Assumed Hull Resistance Curve');
-% xlabel('Speed [kn]');
-% ylabel('Resistance [N]');
+boat_max_speed_kn = froude_n*sqrt(H_length*9.81);% max hull speed [ms]
+hullMedium = HullMedium(H_parameter, H_dampener, ms_to_kn);
 
 %Keel
 K_span = 2; % Keel length [m]
