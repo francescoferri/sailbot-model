@@ -40,9 +40,10 @@ K_airfoil
         
         function [boat_reaction, boat_heel] = computeKeelState(obj, W_speed, W_angle, boat_reaction, boat_speed, boat_heel, K_span, K_avg_ch, K_mass, K_airfoil)
             
-            %% get some initial data & initialize
+            %% get some initial data
             reynolds_number = obj.FluidDensity*K_avg_ch*boat_speed/obj.FluidViscosity;
-            K_area = K_span * K_avg_ch; %[m2] assumed to be square
+            K_area = K_span * K_avg_ch; % [m2] assumed to be square
+            
             boat_drift_force = boat_reaction(1,2); % y-axis force to counteract with the keel
             
             % keel force of gravity
@@ -97,11 +98,11 @@ K_airfoil
             % Location of applied hydro force (switch with COP in the future)
             R = K_span/2;
             Arm = R * n_airfoil;
-            K_torque = cross(Arm, K_force_hydro);
+            K_torque = cross(Arm, K_force);
             boat_reaction(2,:) = boat_reaction(2,:) + K_torque;
 
             % find new heel
-            increase_factor = (boat_reaction(2,1) * 0.02);
+            increase_factor = (-boat_reaction(2,1) * 0.02);
             boat_heel = boat_heel + increase_factor;
 
 
