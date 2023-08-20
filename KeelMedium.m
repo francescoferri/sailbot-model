@@ -65,7 +65,7 @@ K_airfoil
             K_gravity = [0 0 -K_mass*9.81];
 
             % airfoil plane (keel's direction)
-            n_airfoil = [0 sin(boat_heel) -cos(boat_heel)];
+            n_keelfoil = [0 sin(boat_heel) -cos(boat_heel)];
 
             K_force_hydro = [0 0 0];
             K_alpha = 0; % [deg]
@@ -94,10 +94,10 @@ K_airfoil
                 n_water = cross(water_dir, vertical);
                 
                 % using the two planes compute direction of drag
-                drag_direction = cross(n_water, n_airfoil);
+                drag_direction = cross(n_water, n_keelfoil);
                   
                 % Using the drag direction and keel direction we find lift
-                lift_direction = cross(drag_direction, n_airfoil);
+                lift_direction = cross(drag_direction, n_keelfoil);
     
                 Lift = lift_direction*L;
                 Drag = drag_direction*D;
@@ -109,6 +109,46 @@ K_airfoil
             %% Record changes into force balance
             K_force = K_force_hydro + K_gravity;
             boat_reaction(1,:) = boat_reaction(1,:) + K_force;
+
+            %% New Heel Angle
+            
+            % determine new heel angle by solving force balance based on
+            % previously calculated forces.
+            syms new_boat_heel_sym;
+            new_n_keelfoil_sym = [0 sin(new_boat_heel_sym) -cos(new_boat_heel_sym)];
+            
+            % Boat heel must be defined less than 90 to get one solution
+            constraints1 = new_boat_heel_sym <= deg2rad(90);
+            constraints2 = new_boat_heel_sym >= deg2rad(-90);
+
+            K_torque_x = -boat_reaction(2,1);
+            
+            % Torque from Hydro (symbolic)
+            % Location of applied hydro force (switch with COP in the future)
+            R_Hydro = K_span/2;
+            arm_Hydro = R_Hydro*new_n_keelfoil_sym;
+            K_torque_hydro = cross(arm_Hydro,K_force_hydro);
+            
+            %Torque from Gravity (symbolic)
+            R_Gravity = K_span; % approximated as end of keel. Add COG later
+            arm_Gravity = R_Gravity*new_n_keelfoil_sym;
+            K_torque_gravity = cross(arm_Gravity,K_gravity);
+            
+            eqn = K_torque_x == K_torque_gravity(1) +K_torque_hydro(1);
+            new_boat_heel = double(solve(eqn,constraints1,constraints2, ...
+                new_boat_heel_sym,"Real",true));
+
+
+            %% Keel Torques
+            new_n_keelfoil = [0 sin(new_boat_heel) -cos(new_boat_heel)];
+            
+            K_torque = cross(R_Hydro*new_n_keelfoil, K_force_hydro) + ...
+            cross(R_Gravity*new_n_keelfoil,K_gravity);
+            
+            boat_reaction(2,:) = boat_reaction(2,:) + K_torque;
+
+            % change to new heel
+            boat_heel = new_boat_heel;
 
         end
     end
