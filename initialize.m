@@ -33,11 +33,12 @@ sailMedium = SailMedium(rho_air, mu_air, naca18);
 % Hull
 % Assumed resistance curve:
 H_parameter = 7.5; % hull drag parameter
-H_dampener = 0.96;
+H_dampener = 0.4;
 H_length = 2.35; %LOA [m]
 froude_n = 0.7; % defined planing limit
 boat_max_speed_kn = froude_n*sqrt(H_length*9.81);% max hull speed [ms]
-hullMedium = HullMedium(H_parameter, H_dampener, ms_to_kn);
+H_max_speed = boat_max_speed_kn/ms_to_kn;
+hullMedium = HullMedium(H_max_speed, H_parameter, H_dampener, ms_to_kn);
 
 %Keel
 K_span = 2; % Keel length [m]

@@ -1,4 +1,4 @@
-function [cl, cd, cdp, cm, alpha_v, at_stall] = findAirfoilCoeff(reynolds_number, alpha, airfoil_matrix)
+function [cl, cd, cdp, cm, at_stall] = findAirfoilCoeff(reynolds_number, alpha, airfoil_matrix)
 
 % Find Closest Re that is tabulated
 reynolds_tabulated = transpose(unique(airfoil_matrix(:,1))); % Values of Re Tabulated, 500-200-100k
@@ -53,9 +53,9 @@ else % no exact match is found, interpolate
     alpha_v = [lower_value upper_value];
 
     cl = interp1(alpha_v, [data(lower_idx,2) data(upper_idx, 2)], alpha, 'linear');
-    cd = interp1(alpha_v, [data(lower_idx,2) data(upper_idx, 3)], alpha, 'linear');
-    cdp = interp1(alpha_v, [data(lower_idx,2) data(upper_idx, 4)], alpha, 'linear');
-    cm = interp1(alpha_v, [data(lower_idx,2) data(upper_idx, 5)], alpha, 'linear');
+    cd = interp1(alpha_v, [data(lower_idx,3) data(upper_idx, 3)], alpha, 'linear');
+    cdp = interp1(alpha_v, [data(lower_idx,4) data(upper_idx, 4)], alpha, 'linear');
+    cm = interp1(alpha_v, [data(lower_idx,5) data(upper_idx, 5)], alpha, 'linear');
 
 end
 

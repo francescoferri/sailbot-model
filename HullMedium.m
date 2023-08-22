@@ -11,13 +11,15 @@ classdef HullMedium
 
     properties
         HullParameter
+        HullMaxSpeed
         DampenerFactor;
         MsToKn;
     end
     
     methods
-        function obj = HullMedium(H_parameter, H_dampener, ms_to_kn)
+        function obj = HullMedium(H_max_speed, H_parameter, H_dampener, ms_to_kn)
             
+            obj.HullMaxSpeed = H_max_speed;
             obj.HullParameter = H_parameter;
             obj.DampenerFactor = H_dampener;
             obj.MsToKn = ms_to_kn;
@@ -27,8 +29,8 @@ classdef HullMedium
         function [boat_reaction, boat_speed] = computeHullState(obj, boat_reaction, boat_speed)
             
             %% find new boat speed
-            speed = boat_speed(1); % speed magnitude [ms]
-            % u_speed = boat_speed/speed; % speed direction (X-Y plane)
+            speed = norm(boat_speed); % speed magnitude [ms]
+            u_speed = boat_speed/speed; % speed direction (X-Y plane)
 
             % current sailing condition
             current_speed_kn = obj.MsToKn * speed;
@@ -43,14 +45,15 @@ classdef HullMedium
 
             speed = speed + speed_delta * obj.DampenerFactor;
 
-            boat_speed(1) = speed;
+            %% check we are not planing
+            if (speed > obj.HullMaxSpeed)
+                speed = obj.HullMaxSpeed;
+            end
 
-            %% find new drift rate
-            % drift_force = [boat_reaction(1,1) boat_reaction(1,2)];
-            % u_drift_force = drift_force/norm(drift_force);
-            % 
-            % drift_factor = 1;
-            % boat_speed = boat_speed + u_drift_force * drift_factor;
+            %% re-assign direction and leave
+
+            boat_speed = speed * u_speed;
+
 
             %% reset boat reaction vector
             % we assume that the hull can counteract
