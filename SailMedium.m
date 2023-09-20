@@ -72,8 +72,11 @@ S_airfoil
             drag_direction = cross(n_airfoil, n_W_app);
             
             % Using the drag direction and mast direction we find lift
-            lift_direction = cross(drag_direction, n_airfoil);
-
+            lift_direction = cross(n_airfoil, drag_direction);
+            if (lift_direction(1) < 0) % flip tack if lift is backwards
+                lift_direction = cross(drag_direction, n_airfoil);
+            end
+            
             Lift = lift_direction*L;
             Drag = drag_direction*D;
 

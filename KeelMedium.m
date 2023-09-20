@@ -67,8 +67,11 @@ K_airfoil
             drag_direction = cross(n_water, n_keelfoil);
 
             % using the drag direction and keel direction we find lift
-            lift_direction = cross(drag_direction, n_keelfoil);
-            
+            lift_direction = cross(n_keelfoil, drag_direction);
+            if ( sign(lift_direction(2)) == sign(boat_reaction(1,2)) )
+                lift_direction = cross(drag_direction, n_keelfoil);
+            end
+                         
             %% increase alpha untill we reach equilibrium
             at_stall=0;
 
@@ -109,11 +112,12 @@ K_airfoil
             K_torque = K_torque_gravity + K_torque_hydro;
 
             % sum y components
-            K_torque_debt = boat_reaction(2,1) + K_torque(1,2);
+            K_torque_debt = boat_reaction(2,1) + K_torque(1,1);
+            K_total_torque = K_span*K_mass*9.81;
 
-            boat_heel_new = -asin(K_torque_debt/(K_span*K_mass*9.81));
-            heel_delta = boat_heel_new - boat_heel;
-            boat_heel = boat_heel + heel_delta;
+            boat_heel = asin(K_torque_debt/K_total_torque);
+
+            dbstop if error 
 
             %{
 

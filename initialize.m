@@ -15,8 +15,8 @@ boat_torque_vector = [0 0 0]; % [Nm]
 boat_reaction = [boat_force_vector; boat_torque_vector];
 
 % boat generated variables
-boat_speed = [0.01 0]; % [m/s] initialized to non zero for calculation
-boat_heel = -0.01; % [rad] initialized to non zero for calculation
+boat_speed = [0.001 0]; % [m/s] initialized to non zero for calculation
+boat_heel = 0; % [rad] initialized to non zero for calculation
 
 % Import Airfoil Data
 naca18 = csvread("xf-naca0018-il-Re-500k-200k-100k-Main.csv",1,0);
