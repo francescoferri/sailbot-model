@@ -1,4 +1,6 @@
-function [net_force_x, beta] = optim_approach(boat_speed, true_wind_speed,heading_angle)
+function [net_force_x, beta] = optim_approach(boat_speed, ...
+    true_wind_speed,heading_angle, ... %Polar Plot Variables
+    sail_area,sail_average_chord,keel_area,keel_average_chord); %Design Paramaters
 %Permanent Constants
 air_density = 1.225; % [kg/m3]
 air_viscosity = 1.81*10^(-5); % [Pa * s]
@@ -8,14 +10,7 @@ water_viscosity =  1.308*10^(-3); % [Pa * s]
 % Import Airfoil Data
 naca18 = csvread("xf-naca0018-il-Re-500k-200k-100k-Main.csv",1,0);
 
-%Design Paramters
-sail_area = 3; % m^2
-sail_average_chord = 1; % m
-keel_area = 0.5; % m^2
-keel_average_chord = keel_area/2; % m
-
 %Temporary Constants
-leeway_angle = 0; % Degrees
 sail_angle_of_attack = 10; % Degrees
 
 %Input Variables
